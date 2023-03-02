@@ -20,8 +20,7 @@ router.get('/', (req, res, next) => {
 router.post('/create-post/:userId', (req, res, next) => {
 
     let newPost = {
-        title: req.body.title,
-        story: req.body.story,
+        post: req.body.post,
         photo: req.body.photo,
         contributor: req.params.userId,
     }
@@ -40,8 +39,7 @@ router.post('edit-post/:postId/:userId', (req, res, next) => {
 
     Post.findByIdAndUpdate(req.params.postId, 
         {
-        title: req.body.title,
-        story: req.body.story,
+        post: req.body.post,
         }, 
         {new: true}
         )

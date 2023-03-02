@@ -7,11 +7,11 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const saltRounds = 10;
 
-const isAuthenticated = require('../middlware/isAuthenticated')
-
+const isAuthenticated = require('../middleware/isAuthenticated')
 
 router.post("/signup", (req, res, next) => {
-  if (!req.body.email || !req.body.password) {
+  // Add check for username here
+  if (!req.body.email || !req.body.password || !req.body.username) {
     return res.status(400).json({ message: "please fill out all fields" });
   }
 
@@ -24,6 +24,7 @@ router.post("/signup", (req, res, next) => {
         const hashedPass = bcrypt.hashSync(req.body.password, salt);
 
         User.create({
+          username: req.body.username, // Add username field here
           email: req.body.email,
           password: hashedPass,
         })
@@ -69,7 +70,7 @@ router.post("/login", (req, res, next) => {
           algorithm: "HS256",
           expiresIn: "24hr",
         });
-        res.json({ token: token, id: foundUser._id, message: `Welcome ${foundUser.email}` });
+        res.json({ token: token, id: foundUser._id, message: `Welcome ${foundUser.username}` });
       } else {
         return res.status(402).json({ message: "Email or Password is incorrect" });
       }
@@ -82,6 +83,5 @@ router.post("/login", (req, res, next) => {
 router.get("/verify", isAuthenticated, (req, res) => {
   return res.status(200).json(req.user);
 });
-
 
 module.exports = router;

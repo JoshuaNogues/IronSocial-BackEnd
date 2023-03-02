@@ -2,8 +2,7 @@ const { Schema, model } = require("mongoose");
 
 const postSchema = new Schema(
   {
-    title: String,
-    story: String,
+    post: String,
     photo: String,
     contributor: {type: Schema.Types.ObjectId, ref: 'User'},
     comments: [{type: Schema.Types.ObjectId, ref: "Comment"}]
