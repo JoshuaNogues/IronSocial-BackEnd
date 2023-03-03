@@ -10,10 +10,10 @@ const saltRounds = 10;
 const isAuthenticated = require('../middleware/isAuthenticated')
 
 router.post("/signup", (req, res, next) => {
-  // Add check for username here
-  if (!req.body.email || !req.body.password || !req.body.username) {
-    return res.status(400).json({ message: "please fill out all fields" });
-  }
+    const { firstName, lastName, email, password, username } = req.body;
+    if (!firstName || !lastName || !email || !password || !username) {
+      return res.status(400).json({ message: "Please fill out all required fields" });
+    }
 
   User.findOne({ email: req.body.email })
     .then((foundUser) => {
@@ -24,8 +24,10 @@ router.post("/signup", (req, res, next) => {
         const hashedPass = bcrypt.hashSync(req.body.password, salt);
 
         User.create({
-          username: req.body.username, // Add username field here
-          email: req.body.email,
+          firstName: firstName,
+          lastName: lastName,
+          username: username,
+          email: email,
           password: hashedPass,
         })
           .then((createdUser) => {
@@ -70,7 +72,7 @@ router.post("/login", (req, res, next) => {
           algorithm: "HS256",
           expiresIn: "24hr",
         });
-        res.json({ token: token, id: foundUser._id, message: `Welcome ${foundUser.username}` });
+        res.json({ token: token, id: foundUser._id, message: `Welcome ${foundUser.firstName}` });
       } else {
         return res.status(402).json({ message: "Email or Password is incorrect" });
       }
