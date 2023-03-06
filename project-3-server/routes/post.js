@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const Post = require('../models/Post.model');
+const { findById, findByIdAndUpdate } = require('../models/User.model');
 const User = require('../models/User.model')
 
 router.get('/', (req, res, next) => {
@@ -27,16 +28,42 @@ console.log(req.body.postText)
     }
 
     Post.create(newPost)
-        .then((createdPost) => {
-            res.json(createdPost)
+.then((createdPost) => {
+    User.findByIdAndUpdate({_id: req.params.userId}, {
+        $push: {posts: createdPost._id}
+    },{new: true})
+    .then((updatedUser)=> {
+        return updatedUser.populate('posts');
+    })
+    .then((populated) => {
+        res.json(populated)
+    })
+    .catch((err) => {
+        console.log(err)
+    })
+
+})
+.catch((err) => {
+    console.log(err)
+})
+})
+
+router.get('/edit-post/:postId', (req, res, next) => {
+
+    Post.findById(req.params.postId
+        )
+        .populate("contributor")
+        .then((foundPost) => {
+            console.log(foundPost)
+            res.json(foundPost)
         })
         .catch((err) => {
             console.log(err)
         })
-    
+
 })
 
-router.post('/edit-post/:postId/:userId', (req, res, next) => {
+router.post('/edit-post/:postId', (req, res, next) => {
 
     Post.findByIdAndUpdate(req.params.postId, 
         {
@@ -45,6 +72,7 @@ router.post('/edit-post/:postId/:userId', (req, res, next) => {
         {new: true}
         )
         .then((updatedPost) => {
+            console.log(updatedPost)
             res.json(updatedPost)
         })
         .catch((err) => {

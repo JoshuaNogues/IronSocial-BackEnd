@@ -63,15 +63,28 @@ router.post("/login", (req, res, next) => {
       );
 
       if (doesMatch) {
-        const payload = { ...foundUser };
-        console.log(payload)
-        delete payload._doc.password
-
+        const payload = {
+          _id: foundUser._id,
+          firstName: foundUser.firstName,
+          lastName: foundUser.lastName,
+          email: foundUser.email,
+          username: foundUser.username,
+          password: foundUser.password,
+          friends: foundUser.friends,
+          location: foundUser.location,
+          occupation: foundUser.occupation,
+          profile_image: foundUser.profile_image,
+          posts: foundUser.posts
+        };
         const token = jwt.sign(payload, process.env.SECRET, {
           algorithm: "HS256",
           expiresIn: "24hr",
         });
-        res.json({ token: token, id: foundUser._id, message: `Welcome ${foundUser.firstName}` });
+        res.json({
+          token: token,
+          _id: foundUser._id,
+          message: `Welcome ${foundUser.username}`,
+        });
       } else {
         return res.status(402).json({ message: "Email or Password is incorrect" });
       }
@@ -82,7 +95,17 @@ router.post("/login", (req, res, next) => {
 });
 
 router.get("/verify", isAuthenticated, (req, res) => {
-  return res.status(200).json(req.user);
-});
+    User.findOne({ _id: req.user._id })
+    .populate("posts")
+      .then((foundUser) => {
+        const payload = { ...foundUser };
+        console.log(payload);
+        delete payload._doc.password;
+        res.status(200).json(payload._doc);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
 
 module.exports = router;
