@@ -9,6 +9,7 @@ router.get('/', (req, res, next) => {
     .populate('contributor')
     .sort({createdAt: -1})
     .then((foundPosts) => {
+        console.log(foundPosts)
         res.json(foundPosts)
     })
     .catch((err) => {
@@ -18,9 +19,9 @@ router.get('/', (req, res, next) => {
 
 
 router.post('/create-post/:userId', (req, res, next) => {
-
+console.log(req.body.postText)
     let newPost = {
-        post: req.body.post,
+        post: req.body.postText,
         photo: req.body.photo,
         contributor: req.params.userId,
     }
@@ -35,7 +36,7 @@ router.post('/create-post/:userId', (req, res, next) => {
     
 })
 
-router.post('edit-post/:postId/:userId', (req, res, next) => {
+router.post('/edit-post/:postId/:userId', (req, res, next) => {
 
     Post.findByIdAndUpdate(req.params.postId, 
         {

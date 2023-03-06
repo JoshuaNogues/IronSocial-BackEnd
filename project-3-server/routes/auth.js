@@ -10,18 +10,18 @@ const saltRounds = 10;
 const isAuthenticated = require('../middleware/isAuthenticated')
 
 router.post("/signup", (req, res, next) => {
-    const { firstName, lastName, email, password, username } = req.body;
+    const { firstName, lastName, email, password, username, location, occupation } = req.body;
     if (!firstName || !lastName || !email || !password || !username) {
       return res.status(400).json({ message: "Please fill out all required fields" });
     }
 
-  User.findOne({ email: req.body.email })
+  User.findOne({ email: email })
     .then((foundUser) => {
       if (foundUser) {
         return res.status(400).json({ message: "You've already registered" });
       } else {
         const salt = bcrypt.genSaltSync(saltRounds);
-        const hashedPass = bcrypt.hashSync(req.body.password, salt);
+        const hashedPass = bcrypt.hashSync(password, salt);
 
         User.create({
           firstName: firstName,
@@ -29,15 +29,12 @@ router.post("/signup", (req, res, next) => {
           username: username,
           email: email,
           password: hashedPass,
+          location: location,
+          occupation: occupation
         })
           .then((createdUser) => {
-            const payload = { _id: createdUser._id, email: createdUser.email };
-
-            const token = jwt.sign(payload, process.env.SECRET, {
-              algorithm: "HS256",
-              expiresIn: "24hr",
-            });
-            res.json({ token: token, id: createdUser._id });
+            console.log(createdUser)
+            res.json({ createdUser: createdUser });
           })
           .catch((err) => {
             res.status(400).json(err.message);
@@ -66,7 +63,9 @@ router.post("/login", (req, res, next) => {
       );
 
       if (doesMatch) {
-        const payload = { _id: foundUser._id, email: foundUser.email };
+        const payload = { ...foundUser };
+        console.log(payload)
+        delete payload._doc.password
 
         const token = jwt.sign(payload, process.env.SECRET, {
           algorithm: "HS256",

@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
+const isAuthenticated = require('../middleware/isAuthenticated')
+
 const User = require('../models/User.model')
 
 /* GET users listing. */
@@ -15,20 +17,29 @@ router.get('/profile/:userId', (req, res, next) => {
     })
 });
 
-router.post('/profile-edit/:userId', (req, res, next) => {
-  User.findByIdAndUpdate(req.params.userId, 
-    {
-      username: req.body.username,
-      profile_image: req.body.profile_image,
-    },
-    {new: true}
-    )
+router.post('/edit-profile/:userId', isAuthenticated, (req, res, next) => {
+  User.findByIdAndUpdate(req.params.userId, {
+    profile_image: req.body.profile_image,
+    username: req.body.username,
+    password: req.body.password,
+    location: req.body.location,
+    occupation: req.body.occupation
+}, {
+    new: true
+})
+
     .then((updatedUser) => {
-      res.json(updatedUser)
+      console.log(updatedUser)
+      res.json(updatedUser);
     })
     .catch((err) => {
-      console.log(err)
-    })
+      console.log(err);
+      res.status(500).json({
+        message: 'An error occurred while updating the user.',
+        error: err
+      });
+    });
 });
+
 
 module.exports = router;

@@ -16,11 +16,3 @@ const postSchema = new Schema(
 const Post = model("Post", postSchema);
 
 module.exports = Post;
-
-
-// Title
-// Story
-// Date of Trip
-// Contributor
-// Country
-// Created_at
