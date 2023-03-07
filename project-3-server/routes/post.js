@@ -111,6 +111,14 @@ router.post('/comment/:postId', (req, res, next) => {
         },{new: true})
     }).then((foundPost) => {
         console.log(foundPost)
+        return foundPost.populate("comments")
+    }).then((populated)=> {
+        return populated.populate("contributor")
+    }).then((second)=> {
+        res.json(second)
+    })
+    .catch((err) => {
+        console.log(err)
     })
 })
 
