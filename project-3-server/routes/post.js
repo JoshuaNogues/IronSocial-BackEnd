@@ -4,10 +4,12 @@ var router = express.Router();
 const Post = require('../models/Post.model');
 const { findById, findByIdAndUpdate } = require('../models/User.model');
 const User = require('../models/User.model')
+const Comment = require('../models/Comment.model')
 
 router.get('/', (req, res, next) => {
   Post.find()
     .populate('contributor')
+    .populate('comments')
     .sort({createdAt: -1})
     .then((foundPosts) => {
         console.log(foundPosts)
@@ -99,6 +101,17 @@ router.get('/delete-post/:postId/:userId', (req, res, next) => {
         .catch((err) => {
             console.log(err)
         })
+})
+
+router.post('/comment/:postId', (req, res, next) => {
+    Comment.create({comment: req.body.comment})
+    .then((createdComment) => {
+       return Post.findByIdAndUpdate(req.params.postId,{
+            $push:{comments: createdComment._id}
+        },{new: true})
+    }).then((foundPost) => {
+        console.log(foundPost)
+    })
 })
 
 module.exports = router;

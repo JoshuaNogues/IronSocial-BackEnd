@@ -27,10 +27,13 @@ const userSchema = new Schema(
     friends: {
         type: Array,
         default: [],
-      },
+    },
     location: String,
     occupation: String,
-    profile_image: String,
+    profile_image: {
+        type: String,
+        default: "https://www.pngfind.com/pngs/m/676-6764065_default-profile-picture-transparent-hd-png-download.png"
+    },
     posts: [{type: Schema.Types.ObjectId, ref: "Post"}]
   },
   {
