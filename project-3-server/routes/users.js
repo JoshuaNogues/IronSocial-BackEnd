@@ -3,6 +3,8 @@ var router = express.Router();
 
 const isAuthenticated = require('../middleware/isAuthenticated')
 
+const fileUploader = require('../config/cloudinary.config');
+
 const User = require('../models/User.model')
 
 /* GET users listing. */
@@ -19,7 +21,7 @@ router.get('/profile/:userId', (req, res, next) => {
 
 router.post('/edit-profile/:userId', isAuthenticated, (req, res, next) => {
   User.findByIdAndUpdate(req.params.userId, {
-    profile_image: req.body.profile_image,
+    profile_image: req.body.profileImage,
     username: req.body.username,
     password: req.body.password,
     location: req.body.location,
@@ -41,5 +43,9 @@ router.post('/edit-profile/:userId', isAuthenticated, (req, res, next) => {
     });
 });
 
+router.post('/new-profile-photo', fileUploader.single('profileImage'), async (req, res, next) => {
+  res.json({profileImage: req.file.path})
+    console.log("File", req.file)
+})
 
 module.exports = router;

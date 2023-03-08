@@ -5,6 +5,7 @@ const Post = require('../models/Post.model');
 const { findById, findByIdAndUpdate } = require('../models/User.model');
 const User = require('../models/User.model')
 const Comment = require('../models/Comment.model')
+const fileUploader = require('../config/cloudinary.config');
 
 router.get('/', (req, res, next) => {
   Post.find()
