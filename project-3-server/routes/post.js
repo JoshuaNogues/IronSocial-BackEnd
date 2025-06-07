@@ -10,7 +10,12 @@ const fileUploader = require('../config/cloudinary.config');
 router.get('/', (req, res, next) => {
   Post.find()
     .populate('contributor')
-    .populate('comments')
+    .populate({
+        path: 'comments',
+        populate: {
+            path: "user"
+        }
+    })
     .sort({createdAt: -1})
     .then((foundPosts) => {
         console.log(foundPosts)
@@ -105,7 +110,7 @@ router.get('/delete-post/:postId/:userId', (req, res, next) => {
 })
 
 router.post('/comment/:postId', (req, res, next) => {
-    Comment.create({comment: req.body.comment})
+    Comment.create({comment: req.body.comment, user: req.body.user})
     .then((createdComment) => {
        return Post.findByIdAndUpdate(req.params.postId,{
             $push:{comments: createdComment._id}
